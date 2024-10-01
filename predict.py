@@ -2,10 +2,9 @@
 # https://cog.run/python
 
 import cv2
-import import
 import numpy as np
 import torch
-from cog import BasePredictor, Input, Path
+from cog import BasePredictor, Input
 from diffusers import (AutoencoderKL, ControlNetModel,
                        StableDiffusionXLControlNetPipeline)
 from diffusers.utils import load_image
