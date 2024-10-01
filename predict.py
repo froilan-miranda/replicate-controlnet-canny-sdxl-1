@@ -1,13 +1,28 @@
 # Prediction interface for Cog ⚙️
 # https://cog.run/python
 
+import cv2
+import import
+import numpy as np
+import torch
 from cog import BasePredictor, Input, Path
+from diffusers import (AutoencoderKL, ControlNetModel,
+                       StableDiffusionXLControlNetPipeline)
+from diffusers.utils import load_image
+from PIL import Image
 
 
 class Predictor(BasePredictor):
     def setup(self) -> None:
         """Load the model into memory to make running multiple predictions efficient"""
-        # self.model = torch.load("./weights.pth")
+        controlnet = ControlNetModel.from_pretrained(
+            "diffusers/controlnet-canny-sdxl-1.0", torch_dtype=torch.float16
+        )
+        vae = AutoencoderKL.from_pretrained("madebyollin/sdxl-vae-fp16-fix", torch_dtype=torch.float16)
+        self.pipe = StableDiffusionXLControlNetPipeline.from_pretrained(
+            "stabilityai/stable-diffusion-xl-base-1.0", controlnet=controlnet, vae=vae, torch_dtype=torch.float16
+        )
+        self.pipe. enable_model_cpu_offload()
 
     def predict(
         self,
@@ -20,3 +35,24 @@ class Predictor(BasePredictor):
         # processed_input = preprocess(image)
         # output = self.model(processed_image, scale)
         # return postprocess(output)
+        image = load_image(
+            "https://hf.co/datasets/hf-internal-testing/diffusers-images/resolve/main/sd_controlnet/hf-logo.png"
+        )
+        prompt = "aerial view, a futuristic research complex in a bright foggy jungle, hard lighting"
+        negative_prompt = "low quality, bad quality, sketches"
+        controlnet_conditioning_scale = 0.5
+
+        # recommended for good generalization
+        # get canny image
+        image = np. array(image)
+        image = cv2. Canny(image, 100, 200)
+        image = image[:, :, None]
+        image = np. concatenate([image, image, image], axis=2)
+        canny_image = Image.fromarray(image)
+
+        # generate images
+        image = self.pipe(
+            prompt, controlnet_conditioning_scale=controlnet_conditioning_scale, image=canny_image
+        )
+
+        return str(type(image))
