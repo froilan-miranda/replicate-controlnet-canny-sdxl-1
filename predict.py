@@ -33,10 +33,10 @@ class Predictor(BasePredictor):
         prompt: str = Input(description="text to generate the image from", default=""),
         negative_prompt: str = Input(description="Text describing image traits to avoid during generation", default=""),
         guidance_scale: float = Input(description="Floating-point number represeting how closely to adhere to prompt description.", ge=1, le=50, default=12),
-        image_encoding:str = Input("Define which encoding process should be applied before returning the generated image(s).", default="jpeg"),
-        steps: int = Input("Integer representing how many steps of diffusion to run", ge=1, default=50),
-        height: int = Input("The height in pixels of the generated image", default=512),
-        width: int = Input("The width in pixels of the generated image", default=512),
+        image_encoding:str = Input(description="Define which encoding process should be applied before returning the generated image(s).", default="jpeg"),
+        steps: int = Input(description="Integer representing how many steps of diffusion to run", ge=1, default=50),
+        height: int = Input(description="The height in pixels of the generated image", default=512),
+        width: int = Input(description="The width in pixels of the generated image", default=512),
         controlnet_image: str = Input(description="Controlnet image encoded in b64 string for guiding image generation", default=""),
     ) -> bytes:
         """Run a single prediction on the model"""
@@ -59,7 +59,7 @@ class Predictor(BasePredictor):
             image = np. concatenate([image, image, image], axis=2)
             canny_image = Image.fromarray(image)
         else:
-            canny_image = controlnet_image
+            canny_image = Image.open(BytesIO(base64.b64decode(controlnet_image)))
 
         # generate images
         image = self.pipe(
