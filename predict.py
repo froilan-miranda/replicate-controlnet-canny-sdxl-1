@@ -30,9 +30,9 @@ class Predictor(BasePredictor):
 
     def predict(
         self,
-        prompt: str = Input(description="text to generate the image from"),
-        negative_prompt: str = Input(description="Text describing image traits to avoid during generation"),
-        controlnet_image: str = Input(description="Controlnet image encoded in b64 string for guiding image generation"),
+        prompt: str = Input(description="text to generate the image from", default=""),
+        negative_prompt: str = Input(description="Text describing image traits to avoid during generation", default=""),
+        controlnet_image: str = Input(description="Controlnet image encoded in b64 string for guiding image generation", default=""),
         scale: float = Input(
             description="Factor to scale image by", ge=0, le=10, default=1.5
         ),
