@@ -41,25 +41,29 @@ class Predictor(BasePredictor):
         # processed_input = preprocess(image)
         # output = self.model(processed_image, scale)
         # return postprocess(output)
-        image = load_image(
-            "https://hf.co/datasets/hf-internal-testing/diffusers-images/resolve/main/sd_controlnet/hf-logo.png"
-        )
         prompt = "aerial view, a futuristic research complex in a bright foggy jungle, hard lighting"
         negative_prompt = "low quality, bad quality, sketches"
         controlnet_conditioning_scale = 0.5
 
-        # recommended for good generalization
-        # get canny image
-        image = np. array(image)
-        image = cv2. Canny(image, 100, 200)
-        image = image[:, :, None]
-        image = np. concatenate([image, image, image], axis=2)
-        canny_image = Image.fromarray(image)
+        if controlnet_image == "":
+            image = load_image(
+                "https://hf.co/datasets/hf-internal-testing/diffusers-images/resolve/main/sd_controlnet/hf-logo.png"
+            )
+            # recommended for good generalization
+            # get canny image
+            image = np. array(image)
+            image = cv2. Canny(image, 100, 200)
+            image = image[:, :, None]
+            image = np. concatenate([image, image, image], axis=2)
+            canny_image = Image.fromarray(image)
+        else:
+            canny_image = controlnet_image
 
         # generate images
         image = self.pipe(
             prompt, 
             image=canny_image,
+            negative_prompt=negative_prompt,
             controlnet_conditioning_scale=controlnet_conditioning_scale, 
         ).images[0]
 
