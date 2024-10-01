@@ -1,6 +1,11 @@
 # Prediction interface for Cog ⚙️
 # https://cog.run/python
 
+
+
+import base64
+from io import BytesIO
+
 import cv2
 import numpy as np
 import torch
@@ -31,7 +36,7 @@ class Predictor(BasePredictor):
         scale: float = Input(
             description="Factor to scale image by", ge=0, le=10, default=1.5
         ),
-    ) -> str:
+    ) -> bytes:
         """Run a single prediction on the model"""
         # processed_input = preprocess(image)
         # output = self.model(processed_image, scale)
@@ -56,6 +61,10 @@ class Predictor(BasePredictor):
             prompt, 
             image=canny_image,
             controlnet_conditioning_scale=controlnet_conditioning_scale, 
-        )
+        ).images[0]
 
-        return str(type(image))
+        buffered = BytesIO()
+        image.save(buffered, format="JPEG")
+        img_str = base64.b64encode(buffered.getvalue())
+
+        return img_str
