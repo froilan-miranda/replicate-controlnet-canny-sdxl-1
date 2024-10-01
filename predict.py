@@ -32,10 +32,12 @@ class Predictor(BasePredictor):
         self,
         prompt: str = Input(description="text to generate the image from", default=""),
         negative_prompt: str = Input(description="Text describing image traits to avoid during generation", default=""),
+        guidance_scale: float = Input(description="Floating-point number represeting how closely to adhere to prompt description.", ge=1, le=50, default=12),
+        image_encoding:str = Input("Define which encoding process should be applied before returning the generated image(s).", default="jpeg"),
+        steps: int = Input("Integer representing how many steps of diffusion to run", ge=1, default=50),
+        height: int = Input("The height in pixels of the generated image", default=512),
+        width: int = Input("The width in pixels of the generated image", default=512),
         controlnet_image: str = Input(description="Controlnet image encoded in b64 string for guiding image generation", default=""),
-        scale: float = Input(
-            description="Factor to scale image by", ge=0, le=10, default=1.5
-        ),
     ) -> bytes:
         """Run a single prediction on the model"""
         # processed_input = preprocess(image)
@@ -65,10 +67,15 @@ class Predictor(BasePredictor):
             image=canny_image,
             negative_prompt=negative_prompt,
             controlnet_conditioning_scale=controlnet_conditioning_scale, 
+            num_inference_steps=steps,
+            guidance_scale=guidance_scale,
+            width=width,
+            height=height,
+            image_encoding=image_encoding,
         ).images[0]
 
         buffered = BytesIO()
-        image.save(buffered, format="JPEG")
+        image.save(buffered, format=image_encoding)
         img_str = base64.b64encode(buffered.getvalue())
 
         return img_str
