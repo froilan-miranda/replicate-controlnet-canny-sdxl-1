@@ -26,11 +26,13 @@ class Predictor(BasePredictor):
 
     def predict(
         self,
-        image: Path = Input(description="Grayscale input image"),
+        prompt: str = Input(description="text to generate the image from"),
+        negative_prompt: str = Input(description="Text describing image traits to avoid during generation"),
+        controlnet_image: str = Input(description="Controlnet image encoded in b64 string for guiding image generation"),
         scale: float = Input(
             description="Factor to scale image by", ge=0, le=10, default=1.5
         ),
-    ) -> Path:
+    ) -> str:
         """Run a single prediction on the model"""
         # processed_input = preprocess(image)
         # output = self.model(processed_image, scale)
@@ -52,7 +54,9 @@ class Predictor(BasePredictor):
 
         # generate images
         image = self.pipe(
-            prompt, controlnet_conditioning_scale=controlnet_conditioning_scale, image=canny_image
+            prompt, 
+            image=canny_image,
+            controlnet_conditioning_scale=controlnet_conditioning_scale, 
         )
 
         return str(type(image))
