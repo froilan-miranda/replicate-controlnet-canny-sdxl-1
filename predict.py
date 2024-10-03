@@ -4,10 +4,14 @@
 
 
 
+import cv2
+import numpy as np
 import torch
 from cog import BasePredictor, Input
 from diffusers import (AutoencoderKL, ControlNetModel,
                        StableDiffusionXLControlNetPipeline)
+from diffusers.utils import load_image
+from PIL import Image
 
 
 class Predictor(BasePredictor):
