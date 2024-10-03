@@ -4,14 +4,10 @@
 
 
 
-import cv2
-import numpy as np
 import torch
 from cog import BasePredictor, Input
 from diffusers import (AutoencoderKL, ControlNetModel,
                        StableDiffusionXLControlNetPipeline)
-from diffusers.utils import load_image
-from PIL import Image
 
 
 class Predictor(BasePredictor):
@@ -45,23 +41,23 @@ class Predictor(BasePredictor):
         negative_prompt = "low quality, bad quality, sketches"
         controlnet_conditioning_scale = 0.5
 
-        if controlnet_image == "":
-            image = load_image(
-                "https://hf.co/datasets/hf-internal-testing/diffusers-images/resolve/main/sd_controlnet/hf-logo.png"
-            )
-            # recommended for good generalization
-            # get canny image
-            image = np.array(image)
-            image = cv2.Canny(image, 100, 200)
-            image = image[:, :, None]
-            image = np.concatenate([image, image, image], axis=2)
-            canny_image = Image.fromarray(image)
-        else:
-            #image_data = base64.b64decode(controlnet_image)
-            #canny_image = Image.open(BytesIO(image_data))
-            return "test"
+        # if controlnet_image == "":
+        #     image = load_image(
+        #         "https://hf.co/datasets/hf-internal-testing/diffusers-images/resolve/main/sd_controlnet/hf-logo.png"
+        #     )
+        #     # recommended for good generalization
+        #     # get canny image
+        #     image = np.array(image)
+        #     image = cv2.Canny(image, 100, 200)
+        #     image = image[:, :, None]
+        #     image = np.concatenate([image, image, image], axis=2)
+        #     canny_image = Image.fromarray(image)
+        # else:
+        #     #image_data = base64.b64decode(controlnet_image)
+        #     #canny_image = Image.open(BytesIO(image_data))
+        #     return "true"
 
-        return "false"
+        return "test"
         # generate images
         # image = self.pipe(
         #     prompt, 
