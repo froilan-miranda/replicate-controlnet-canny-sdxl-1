@@ -53,13 +53,14 @@ class Predictor(BasePredictor):
             )
             # recommended for good generalization
             # get canny image
-            image = np. array(image)
-            image = cv2. Canny(image, 100, 200)
+            image = np.array(image)
+            image = cv2.Canny(image, 100, 200)
             image = image[:, :, None]
-            image = np. concatenate([image, image, image], axis=2)
+            image = np.concatenate([image, image, image], axis=2)
             canny_image = Image.fromarray(image)
         else:
-            canny_image = Image.open(BytesIO(base64.b64decode(controlnet_image)))
+            image_data = base64.b64decode(controlnet_image)
+            canny_image = Image.open(BytesIO(image_data))
 
         # generate images
         image = self.pipe(
