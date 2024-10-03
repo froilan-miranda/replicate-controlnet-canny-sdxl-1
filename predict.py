@@ -3,8 +3,6 @@
 
 
 
-import base64
-from io import BytesIO
 
 import cv2
 import numpy as np
@@ -38,7 +36,7 @@ class Predictor(BasePredictor):
         height: int = Input(description="The height in pixels of the generated image", default=512),
         width: int = Input(description="The width in pixels of the generated image", default=512),
         controlnet_image: str = Input(description="Controlnet image encoded in b64 string for guiding image generation", default=""),
-    ) -> bytes:
+    ) -> str:
         """Run a single prediction on the model"""
         # processed_input = preprocess(image)
         # output = self.model(processed_image, scale)
@@ -59,25 +57,26 @@ class Predictor(BasePredictor):
             image = np.concatenate([image, image, image], axis=2)
             canny_image = Image.fromarray(image)
         else:
-            image_data = base64.b64decode(controlnet_image)
+            #image_data = base64.b64decode(controlnet_image)
             #canny_image = Image.open(BytesIO(image_data))
-            return image_data
+            return "test"
 
+        return "false"
         # generate images
-        image = self.pipe(
-            prompt, 
-            image=canny_image,
-            negative_prompt=negative_prompt,
-            controlnet_conditioning_scale=controlnet_conditioning_scale, 
-            num_inference_steps=steps,
-            guidance_scale=guidance_scale,
-            width=width,
-            height=height,
-            image_encoding=image_encoding,
-        ).images[0]
-
-        buffered = BytesIO()
-        image.save(buffered, format=image_encoding)
-        img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
-
-        return img_str
+        # image = self.pipe(
+        #     prompt, 
+        #     image=canny_image,
+        #     negative_prompt=negative_prompt,
+        #     controlnet_conditioning_scale=controlnet_conditioning_scale, 
+        #     num_inference_steps=steps,
+        #     guidance_scale=guidance_scale,
+        #     width=width,
+        #     height=height,
+        #     image_encoding=image_encoding,
+        # ).images[0]
+        #
+        # buffered = BytesIO()
+        # image.save(buffered, format=image_encoding)
+        # img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
+        #
+        # return img_str
