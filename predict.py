@@ -37,25 +37,25 @@ class Predictor(BasePredictor):
         # processed_input = preprocess(image)
         # output = self.model(processed_image, scale)
         # return postprocess(output)
-        prompt = "aerial view, a futuristic research complex in a bright foggy jungle, hard lighting"
-        negative_prompt = "low quality, bad quality, sketches"
-        controlnet_conditioning_scale = 0.5
 
-        # if controlnet_image == "":
-        #     image = load_image(
-        #         "https://hf.co/datasets/hf-internal-testing/diffusers-images/resolve/main/sd_controlnet/hf-logo.png"
-        #     )
-        #     # recommended for good generalization
-        #     # get canny image
-        #     image = np.array(image)
-        #     image = cv2.Canny(image, 100, 200)
-        #     image = image[:, :, None]
-        #     image = np.concatenate([image, image, image], axis=2)
-        #     canny_image = Image.fromarray(image)
-        # else:
-        #     #image_data = base64.b64decode(controlnet_image)
-        #     #canny_image = Image.open(BytesIO(image_data))
-        #     return "true"
+        if controlnet_image == "":
+            prompt = "aerial view, a futuristic research complex in a bright foggy jungle, hard lighting"
+            negative_prompt = "low quality, bad quality, sketches"
+            controlnet_conditioning_scale = 0.5
+            image = load_image(
+                "https://hf.co/datasets/hf-internal-testing/diffusers-images/resolve/main/sd_controlnet/hf-logo.png"
+            )
+            # recommended for good generalization
+            # get canny image
+            image = np.array(image)
+            image = cv2.Canny(image, 100, 200)
+            image = image[:, :, None]
+            image = np.concatenate([image, image, image], axis=2)
+            canny_image = Image.fromarray(image)
+        else:
+            #image_data = base64.b64decode(controlnet_image)
+            #canny_image = Image.open(BytesIO(image_data))
+            return "true"
 
         return "test"
         # generate images
