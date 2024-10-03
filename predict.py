@@ -4,6 +4,9 @@
 
 
 
+import base64
+from io import BytesIO
+
 import cv2
 import numpy as np
 import torch
@@ -57,8 +60,8 @@ class Predictor(BasePredictor):
             image = np.concatenate([image, image, image], axis=2)
             canny_image = Image.fromarray(image)
         else:
-            #image_data = base64.b64decode(controlnet_image)
-            #canny_image = Image.open(BytesIO(image_data))
+            image_data = base64.b64decode(controlnet_image)
+            canny_image = Image.open(BytesIO(image_data))
             return "true"
 
         return "test"
