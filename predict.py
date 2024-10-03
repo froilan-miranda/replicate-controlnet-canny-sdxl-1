@@ -38,7 +38,7 @@ class Predictor(BasePredictor):
         height: int = Input(description="The height in pixels of the generated image", default=512),
         width: int = Input(description="The width in pixels of the generated image", default=512),
         controlnet_image: str = Input(description="Controlnet image encoded in b64 string for guiding image generation", default=""),
-    ) -> str:
+    ) -> bytes:
         """Run a single prediction on the model"""
         # processed_input = preprocess(image)
         # output = self.model(processed_image, scale)
@@ -60,7 +60,8 @@ class Predictor(BasePredictor):
             canny_image = Image.fromarray(image)
         else:
             image_data = base64.b64decode(controlnet_image)
-            canny_image = Image.open(BytesIO(image_data))
+            #canny_image = Image.open(BytesIO(image_data))
+            return image_data
 
         # generate images
         image = self.pipe(
