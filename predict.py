@@ -38,7 +38,7 @@ class Predictor(BasePredictor):
         height: int = Input(description="The height in pixels of the generated image", default=512),
         width: int = Input(description="The width in pixels of the generated image", default=512),
         controlnet_image: str = Input(description="Controlnet image encoded in b64 string for guiding image generation", default=""),
-    ) -> bytes:
+    ) -> str:
         """Run a single prediction on the model"""
         # processed_input = preprocess(image)
         # output = self.model(processed_image, scale)
@@ -77,6 +77,6 @@ class Predictor(BasePredictor):
 
         buffered = BytesIO()
         image.save(buffered, format=image_encoding)
-        img_str = base64.b64encode(buffered.getvalue())
+        img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
 
         return img_str
