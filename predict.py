@@ -1,9 +1,5 @@
 # Prediction interface for Cog ⚙️
 # https://cog.run/python
-
-
-
-
 import base64
 from io import BytesIO
 
@@ -11,7 +7,8 @@ import cv2
 import numpy as np
 import torch
 from cog import BasePredictor, Input
-from diffusers import (AutoencoderKL, ControlNetModel,
+from diffusers import (AutoencoderKL, ControlNetModel, DDIMScheduler,
+                       LMSDiscreteScheduler, PNDMScheduler,
                        StableDiffusionXLControlNetPipeline)
 from diffusers.utils import load_image
 from PIL import Image
@@ -39,13 +36,11 @@ class Predictor(BasePredictor):
         height: int = Input(description="The height in pixels of the generated image", default=512),
         width: int = Input(description="The width in pixels of the generated image", default=512),
         controlnet_image: str = Input(description="Controlnet image encoded in b64 string for guiding image generation", default=""),
-        controlnet_conditioning_scale: float = Input(description="The outputs of the ControlNet are multiplied by controlnet_conditioning_scale before they are added to the residual in the original unet", default=1)
+        controlnet_conditioning_scale: float = Input(description="The outputs of the ControlNet are multiplied by controlnet_conditioning_scale before they are added to the residual in the original unet", default=1),
+        scheduler: str = Input(description="A scheduler to be used in combination with unet to denoise the encoded image latents.", defualt="DDIM"),
+        control_guidance_start: float = Input(description="The percentage of total steps at which the ControlNet starts applying", defualt=0.0),
+        control_guidance_end: float = Input(description="The percentage of total steps at which the ControlNet ends applying", defualt=1.0)
     ) -> str:
-        """Run a single prediction on the model"""
-        # processed_input = preprocess(image)
-        # output = self.model(processed_image, scale)
-        # return postprocess(output)
-
         if controlnet_image == "":
             prompt = "aerial view, a futuristic research complex in a bright foggy jungle, hard lighting"
             negative_prompt = "low quality, bad quality, sketches"
@@ -64,6 +59,15 @@ class Predictor(BasePredictor):
             image_data = base64.b64decode(controlnet_image)
             canny_image = Image.open(BytesIO(image_data))
 
+        # Load Scheduler
+        match scheduler:
+            case "DDIM":
+                self.pipe.scheduler = DDIMScheduler.from_config(self.pipe.scheduler.config)
+            case "LMSDiscrete":
+                self.pipe.scheduler = LMSDiscreteScheduler.from_config(self.pipe.scheduler.config)
+            case "PNDM":
+                self.pipe.scheduler = PNDMScheduler.from_config(self.pipe.scheduler.config)
+
         # generate images
         image = self.pipe(
             prompt, 
@@ -75,6 +79,8 @@ class Predictor(BasePredictor):
             width=width,
             height=height,
             image_encoding=image_encoding,
+            control_guidance_start=control_guidance_start,
+            control_guidance_end=control_guidance_end
         ).images[0]
 
         buffered = BytesIO()
