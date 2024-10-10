@@ -38,8 +38,8 @@ class Predictor(BasePredictor):
         controlnet_image: str = Input(description="Controlnet image encoded in b64 string for guiding image generation", default=""),
         controlnet_conditioning_scale: float = Input(description="The outputs of the ControlNet are multiplied by controlnet_conditioning_scale before they are added to the residual in the original unet", default=1),
         scheduler: str = Input(description="A scheduler to be used in combination with unet to denoise the encoded image latents.", default="DDIM"),
-        control_guidance_start: float = Input(description="The percentage of total steps at which the ControlNet starts applying", default=0.0),
-        control_guidance_end: float = Input(description="The percentage of total steps at which the ControlNet ends applying", default=1.0)
+        control_guidance_start: float = Input(description="The percentage of total steps at which the ControlNet starts applying", default=0.0, ge=0, le=1),
+        control_guidance_end: float = Input(description="The percentage of total steps at which the ControlNet ends applying", default=1.0, ge=0, le=1)
     ) -> str:
         if controlnet_image == "":
             prompt = "aerial view, a futuristic research complex in a bright foggy jungle, hard lighting"
